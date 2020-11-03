@@ -1,7 +1,6 @@
-#jww
-#sndfknasdlfnlasndfls
-#sss
-#asdfghjkl
-#sofsdoks
-#jvjvhvj
-#klsflsmcsldkc
+#git add .
+#git commit -m "str"
+#git push
+#git status
+
+#git commit -am "adas"
