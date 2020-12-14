@@ -10,19 +10,29 @@ from matplotlib import widgets
 import time
 
 move=[]
+code=[]
 solution=[]
 rubik = [[["y1","y2","y3"],["y4","y5","y6"],["y7","y8","y9"]]
         ,[["b1","b2","b3"],["b4","b5","b6"],["b7","b8","b9"]]
         ,[["r1","r2","r3"],["r4","r5","r6"],["r7","r8","r9"]]
         ,[["g1","g2","g3"],["g4","g5","g6"],["g7","g8","g9"]]
         ,[["o1","o2","o3"],["o4","o5","o6"],["o7","o8","o9"]]
-        ,[["w1","w2","w3"],["w4","w5","w6"],["w7","w8","w9"]],move]
+        ,[["w1","w2","w3"],["w4","w5","w6"],["w7","w8","w9"]],move,code]
+
+turn_cube= [[["y1","y2","y3"],["y4","y5","y6"],["y7","y8","y9"]]
+        ,[["b1","b2","b3"],["b4","b5","b6"],["b7","b8","b9"]]
+        ,[["r1","r2","r3"],["r4","r5","r6"],["r7","r8","r9"]]
+        ,[["g1","g2","g3"],["g4","g5","g6"],["g7","g8","g9"]]
+        ,[["o1","o2","o3"],["o4","o5","o6"],["o7","o8","o9"]]
+        ,[["w1","w2","w3"],["w4","w5","w6"],["w7","w8","w9"]],move,code]
+
 solve = [[["y1","y2","y3"],["y4","y5","y6"],["y7","y8","y9"]]
         ,[["b1","b2","b3"],["b4","b5","b6"],["b7","b8","b9"]]
         ,[["r1","r2","r3"],["r4","r5","r6"],["r7","r8","r9"]]
         ,[["g1","g2","g3"],["g4","g5","g6"],["g7","g8","g9"]]
         ,[["o1","o2","o3"],["o4","o5","o6"],["o7","o8","o9"]]
-        ,[["w1","w2","w3"],["w4","w5","w6"],["w7","w8","w9"]],move]
+        ,[["w1","w2","w3"],["w4","w5","w6"],["w7","w8","w9"]],move,code]
+
 
 """
 Sticker representation
@@ -498,20 +508,21 @@ class InteractiveCube(plt.Axes):
     def rotate(self, rot):
         self._current_rot = self._current_rot * rot
 
-    def rotate_face(self, face, turns=1, layer=0, steps=5):
+    def rotate_face(self, face, turns=1, layer=0, steps=1):
 ###
         if not np.allclose(turns, 0):
             for i in range(0,steps):
                 self.cube.rotate_face(face, turns * 1. / steps,
                                       layer=layer)
                 self._draw_cube()
-    #        time.sleep(1)
+            
+        
+        
         if turns==1:
-    #        print(face)
             turn(face,b=2)
         if turns==-1:
-    #         print(face+"3")
             turn(face+"3",b=2)
+        
         
 ###
     def _reset_view(self, *args):
@@ -520,30 +531,53 @@ class InteractiveCube(plt.Axes):
         self._current_rot = self._start_rot
         self._draw_cube()
 
-    def _solve_cube(self, *args,rubik=rubik,solve=solve):
+
+    def _solve_cube(self, *args,rubik_1=rubik):
         move=[]
-        rubik[6]=[]
-        solve_the_rubik(rubik)
-        #print("rubik is",rubik[6])
+        rubik_1[6]=[]
+        solve_the_rubik(rubik_1)
+
+        if len(rubik_1[6])==0:
+            print("The rubik is already solve!!!")
+            return rubik_1
+        
+        print("\nSolution is",rubik_1[6])
+        print("\nCode is",rubik_1[7])
+        print("\nT_perm\tis R U R3 U3 R3 F R2 U3 R3 U3 R U R3 F3")
+        print("Ja_perm\tis R U R3 F3 R U R3 U3 R3 F R2 U3 R3 U3")
+        print("Jb_perm\tis R2 D R D3 R F2 Rw3 F Rw F2")
+        print("Y_perm\tis F R U3 R3 U3 R U R3 F3 R U R3 U3 R3 F R F3")
+        print("Ra_perm\tis R U R3 F3 R U2 R3 U2 R3 F R U R U2 R3 U3")
+        
         sol=[]
-        for a in rubik[6]:
-            if a in ["(T)","(Jb)","(Ja)","(Y)","(Ra)"]:
-                if a=="(T)":
-                    b=["R","U","R3","U3","R3","F","R2","U3","R3","U3","R","U","R3","F3"]
-                if a=="(Jb)":
-                    b=["R2","D","R","D3","R","F2","Rw3","F","Rw","F2"]
-                if a=="(Ja)":
-                    b=["R","U","R3","F3","R","U","R3","U3","R3","F","R2","U3","R3","U3"]
-                if a=="(Y)":
-                    b=["F","R","U3","R3","U3","R","U","R3","F3","R","U","R3","U3","R3","F","R","F3"]
-                if a=="(Ra)":
-                    b=["R","U","R3","F3","R","U2","R3","U2","R3","F","R","U","R","U2","R3","U3"]
-                for c in b:
+
+        while len(rubik_1[6])!=0:
+            a = rubik_1[6].pop(0)
+            
+            if a in ["(T)","(Jb)","(Ja)","(Y)","(Ra)","(x)","(y)","(z)","(x2)","(y2)","(z2)","(x3)","(y3)","(z3)"]:
+                b={"(T)":["R","U","R3","U3","R3","F","R2","U3","R3","U3","R","U","R3","F3"],
+                   "(Jb)":["R2","D","R","D3","R","F2","Rw3","F","Rw","F2"],
+                   "(Ja)":["R","U","R3","F3","R","U","R3","U3","R3","F","R2","U3","R3","U3"],
+                   "(Y)":["F","R","U3","R3","U3","R","U","R3","F3","R","U","R3","U3","R3","F","R","F3"],
+                   "(Ra)":["R","U","R3","F3","R","U2","R3","U2","R3","F","R","U","R","U2","R3","U3"],
+                   "(x)":["Rw","L3"],
+                   "(x2)":["Rw2","L2"],
+                   "(x3)":["Rw3","L"],
+                   "(y)":["Uw","D3"],
+                   "(y2)":["Uw2","D2"],
+                   "(y3)":["Uw3","D"],
+                   "(z)":["Fw","B3"],
+                   "(z2)":["Fw2","B2"],
+                   "(z3)":["Fw3","B"],
+                   }
+               
+                for c in b[a]:
                     sol.append(c)                
             else:
                 sol.append(a)
-        #print("move is",sol)
-        for i in sol:
+
+        while len(sol)!=0:
+            i = sol.pop(0)
             if i in ("U","L","F","R","B","D"):
                 self.rotate_face(i)
             if i in ["U2","L2","F2","R2","B2","D2"]:
@@ -560,17 +594,26 @@ class InteractiveCube(plt.Axes):
                 self.rotate_face(i[0], -1)
                 self.rotate_face(i[0], -1,layer=1)
             #print("move is",i)
-        reset_rubik(rubik)
-   #         move_list = self.cube._move_list[:]
-    #        move=0
-     #       for (face, n, layer) in move_list[::-1]:
-      #          self.rotate_face(face, -n, layer, steps=3)
-     #           print(move_list[move][0],move_list[move][1])
-      #          move+=1
-       #     self.cube._move_list = []
+
+        code.clear()       
+        solution.clear()
+
+        rubik.clear()
+        rubik.append([["y1","y2","y3"],["y4","y5","y6"],["y7","y8","y9"]])
+        rubik.append([["b1","b2","b3"],["b4","b5","b6"],["b7","b8","b9"]])
+        rubik.append([["r1","r2","r3"],["r4","r5","r6"],["r7","r8","r9"]])
+        rubik.append([["g1","g2","g3"],["g4","g5","g6"],["g7","g8","g9"]])
+        rubik.append([["o1","o2","o3"],["o4","o5","o6"],["o7","o8","o9"]])
+        rubik.append([["w1","w2","w3"],["w4","w5","w6"],["w7","w8","w9"]])
+        rubik.append(move)
+        rubik.append(code)
+        
+        self.cube._move_list = []
+        return rubik
 
     def _key_press(self, event):
         """Handler for key press events"""
+        
         if event.key == 'shift':
             self._shift = True
         elif event.key.isdigit():
@@ -600,22 +643,15 @@ class InteractiveCube(plt.Axes):
                 direction = -1
             else:
                 direction = 1
-
+            N=3
             if np.any(self._digit_flags[:N]):
                 for d in np.arange(N)[self._digit_flags[:N]]:
                     self.rotate_face(event.key.upper(), direction, layer=d)
+                    
             else:
-                self.rotate_face(event.key.upper(), direction)
-
-#        elif event.key.upper() in 'M':
- #           if self._shift:
-  #              direction = -1
-   #         else:
-    #            direction = 1
-     #       self.rotate_face(event.key.upper(), direction, layer=1)
-
-                
+                self.rotate_face(event.key.upper(), direction)       
         self._draw_cube()
+        
 
     def _key_release(self, event):
         """Handler for key release event"""
@@ -668,11 +704,6 @@ class InteractiveCube(plt.Axes):
                 self.set_ylim(factor * ylim[0], factor * ylim[1])
 
                 self.figure.canvas.draw()
-#    def ok(self, *args):
- #       move_list = self.cube._move_list[:]
-  #      for (face, n, layer) in move_list[::-1]:
-   #         self.rotate_face(face, -n, layer, steps=3)
-    #    self.cube._move_list = []
 ####################################################################################
 import random
 
@@ -702,6 +733,12 @@ def read_rubik(rubik):
             print(rubik[5][i][j],end=" ")
         print("")
     print("")
+
+def turns(a,b=0):
+    a=a.split(" ")
+    for i in a:
+        turn(i,b)
+
 def turn(a,b=0):
     #read_rubik(rubik)
     if a=="U":
@@ -859,31 +896,26 @@ def turn(a,b=0):
     if a=="T":
         a="(T)"
         solution.append(a)
-        #print(a,end=" ")
         b=2
         T_perm(rubik)    
     if a=="Ja":
         a="(Ja)"
         solution.append(a)
-        #print(a,end=" ")
         b=2
         Ja_perm(rubik)
     if a=="Jb":
         a="(Jb)"
         solution.append(a)
-        #print(a,end=" ")
         b=2
         Jb_perm(rubik)
     if a=="Y":
         a="(Y)"
         solution.append(a)
-        #print(a,end=" ")
         b=2
         Y_perm(rubik)
     if a=="Ra":
         a="(Ra)"
         solution.append(a)
-        #print(a,end=" ")
         b=2
         Ra_perm(rubik)
         
@@ -898,13 +930,12 @@ def turn(a,b=0):
         b=1
         print("start")
         
+    
     if b==0:
         solution.append(a)
-        #print(a,end=" ")
     if b==1:
         solution.clear()
     if b==2:
-        #print(a,end=" ")
         return solution
     return solution
 
@@ -1401,33 +1432,28 @@ def z3_rotation(rubik):
     return rubik
 
 def T_perm(rubik):
-    a = ["R","U","R3","U3","R3","F","R2","U3","R3","U3","R","U","R3","F3"]
-    for i in a:
-        turn(i,b=2)
+    a = "R U R3 U3 R3 F R2 U3 R3 U3 R U R3 F3"
+    turns(a,b=2)
     return rubik
 
 def Jb_perm(rubik):
-    a = ["R2","D","R","D3","R","F2","Rw3","F","Rw","F2"]
-    for i in range(0,10):
-        turn(a[i],b=2)
+    a = "R2 D R D3 R F2 Rw3 F Rw F2"
+    turns(a,b=2)
     return rubik
 
 def Ja_perm(rubik):
-    a = ["R","U","R3","F3","R","U","R3","U3","R3","F","R2","U3","R3","U3"]
-    for i in range(0,14):
-        turn(a[i],b=2)
+    a = "R U R3 F3 R U R3 U3 R3 F R2 U3 R3 U3"
+    turns(a,b=2)
     return rubik
 
 def Y_perm(rubik):
-    a = ["F","R","U3","R3","U3","R","U","R3","F3","R","U","R3","U3","R3","F","R","F3"]
-    for i in range(0,17):
-        turn(a[i],b=2)
+    a = "F R U3 R3 U3 R U R3 F3 R U R3 U3 R3 F R F3"
+    turns(a,b=2)
     return rubik
 
 def Ra_perm(rubik):
-    a = ["R","U","R3","F3","R","U2","R3","U2","R3","F","R","U","R","U2","R3","U3"]
-    for i in range(0,16):
-        turn(a[i],b=2)
+    a = "R U R3 F3 R U2 R3 U2 R3 F R U R U2 R3 U3"
+    turns(a,b=2)
     return rubik
 ###
 def scramble(rubik):
@@ -1443,7 +1469,7 @@ def scramble(rubik):
             if r==1:
                 x="U"
             if r==2:
-                 x="U2"
+                x="U2"
             if r==3:
                 x="U3"
             if r==4:
@@ -1501,23 +1527,21 @@ def check_sticker(digit,rubik):
 ###Solve Binndford center
 def solve_center(rubik):
     if "y5"==rubik[1][1][1]:
-        turn("z")
+        turns("z")
     if "y5"==rubik[2][1][1]:
-        turn("x")
+        turns("x")
     if "y5"==rubik[3][1][1]:
-        turn("z3")
+        turns("z3")
     if "y5"==rubik[4][1][1]:
-        turn("x3")
+        turns("x3")
     if "y5"==rubik[5][1][1]:
-        turn("x2")
-
+        turns("x2")
     if "r5"==rubik[1][1][1]:
-        turn("y3")
+        turns("y3")
     if "r5"==rubik[3][1][1]:
-        turn("y")
+        turns("y")
     if "r5"==rubik[4][1][1]:
-        turn("y2")
-
+        turns("y2")
     return rubik
     
 ###Solve Binndford edge
@@ -1537,12 +1561,13 @@ def solve_edge(buffer_edge,rubik):
             if solve[i][2][1] == rubik[i][2][1]:
                 correct_edge+=1
         if correct_edge==24:
-            #print("Total number of edge swap is",edge_swap)
+            print("Total number of edge swap i",edge_swap)
             if edge_swap%2==1:
-                #print("Have parity do Ra_perm")
+                print("Have parity do Ra_perm")
                 turn("Ra")
+                code.append("(Ra)")
             else:
-                #print("No parity")
+                print("No parity")
                 return rubik
             return rubik
         
@@ -1562,121 +1587,67 @@ def solve_edge(buffer_edge,rubik):
                 if  solve[i][2][1] != rubik[i][2][1]:
                     buffer_edge=rubik[i][2][1]
                     break
-            
-        if buffer_edge=="y2":
-            turn("Jb")
-        if buffer_edge=="y4":
-            turn("T")
-        if buffer_edge=="y8":
-            turn("Ja")
-        if buffer_edge=="b2":
-            turn("L3")
-            turn("Dw")
-            turn("L3")
-            turn("T")
-            turn("L")
-            turn("Dw3")
-            turn("L")        
-        if buffer_edge=="b4":
-            turn("Dw")
-            turn("L3")
-            turn("T")
-            turn("L")
-            turn("Dw3")        
-        if buffer_edge=="b6":
-            turn("Dw3")
-            turn("L")
-            turn("T")
-            turn("L3")
-            turn("Dw")        
-        if buffer_edge=="b8":
-            turn("L")
-            turn("Dw")
-            turn("L3")
-            turn("T")
-            turn("L")
-            turn("Dw3")
-            turn("L3")  
-        if buffer_edge=="r2":
-            turn("Lw3")
-            turn("Jb")
-            turn("Lw")
-        if buffer_edge=="r4":
-            turn("L3")
-            turn("T")
-            turn("L")
-        if buffer_edge=="r6":
-            turn("Dw2")
-            turn("L")
-            turn("T")
-            turn("L3")
-            turn("Dw2")
-        if buffer_edge=="r8":
-            turn("Lw3")
-            turn("Ja")
-            turn("Lw")      
-        if buffer_edge=="g4":
-            turn("Dw3")
-            turn("L3")
-            turn("T")
-            turn("L")
-            turn("Dw")  
-        if buffer_edge=="g6":
-            turn("Dw")
-            turn("L")
-            turn("T")
-            turn("L3")
-            turn("Dw3")            
-        if buffer_edge=="g8":
-            turn("D3")
-            turn("Lw3")
-            turn("Ja")
-            turn("Lw")
-            turn("D")    
-        if buffer_edge=="o2":
-            turn("Lw")
-            turn("Ja")
-            turn("Lw3")    
-        if buffer_edge=="o4":
-            turn("Dw2")
-            turn("L3")
-            turn("T")
-            turn("L")
-            turn("Dw2")   
-        if buffer_edge=="o6":
-            turn("L")
-            turn("T")
-            turn("L3")
-        if buffer_edge=="o8":
-            turn("Lw")
-            turn("Jb")
-            turn("Lw3")
-        if buffer_edge=="w2":
-            turn("D3")
-            turn("L2")
-            turn("T")
-            turn("L2")
-            turn("D")   
-        if buffer_edge=="w4":
-            turn("L2")
-            turn("T")
-            turn("L2")
-        if buffer_edge=="w6":
-            turn("D2")
-            turn("L2")
-            turn("T")
-            turn("L2")
-            turn("D2")   
-        if buffer_edge=="w8":
-            turn("D")
-            turn("L2")
-            turn("T")
-            turn("L2")
-            turn("D3")
+
+        if buffer_edge[0]=="y":
+            if buffer_edge=="y2":
+                turns("Jb")
+            if buffer_edge=="y4":
+                turns("T")
+            if buffer_edge=="y8":
+                turns("Ja")
+
+        if buffer_edge[0]=="b":   
+            if buffer_edge=="b2":
+                turns("L3 Dw L3 T L Dw3 L")
+            if buffer_edge=="b4":
+                turns("Dw L3 T L Dw3")
+            if buffer_edge=="b6":
+                turns("Dw3 L T L3 Dw")    
+            if buffer_edge=="b8":
+                turns("L Dw L3 T L Dw3 L3")
+
+        if buffer_edge[0]=="r":           
+            if buffer_edge=="r2":
+                turns("Lw3 Jb Lw")
+            if buffer_edge=="r4":
+                turns("L3 T L")
+            if buffer_edge=="r6":
+                turns("Dw2 L T L3 Dw2")
+            if buffer_edge=="r8":
+                turns("Lw3 Ja Lw")
+
+        if buffer_edge[0]=="g":           
+            if buffer_edge=="g4":
+                turns("Dw3 L3 T L Dw") 
+            if buffer_edge=="g6":
+                turns("Dw L T L3 Dw3")        
+            if buffer_edge=="g8":
+                turns("D3 Lw3 Ja Lw D")
+
+        if buffer_edge[0]=="o":           
+            if buffer_edge=="o2":
+                turns("Lw Ja Lw3")   
+            if buffer_edge=="o4":
+                turns("Dw2 L3 T L Dw2")
+            if buffer_edge=="o6":
+                turns("L T L3")
+            if buffer_edge=="o8":
+                turns("Lw Jb Lw3")
+
+        if buffer_edge[0]=="w":           
+            if buffer_edge=="w2":
+                turns("D3 L2 T L2 D")
+            if buffer_edge=="w4":
+                turns("L2 T L2")
+            if buffer_edge=="w6":
+                turns("D2 L2 T L2 D2")  
+            if buffer_edge=="w8":
+                turns("D L2 T L2 D3")
         edge_swap+=1
-        #read_rubik(rubik)
+        read_rubik(rubik)
         buffer_edge=check_sticker(buffer_edge_digit,rubik)
-        #print("Number of edge swap is",edge_swap)
+        code.append(buffer_edge)
+        print("Number of edge swap is",edge_swap)
 
     return rubik
 ###Solve Binndford conner
@@ -1685,7 +1656,7 @@ def solve_corner(buffer_corner,rubik):
     buffer_corner_digit=[1,0,0]
     buffer_corner=check_sticker(buffer_corner_digit,rubik)
     while True:
-        correct=0        
+        correct=0
         for i in range(0,6):
             if solve[i][0][0] == rubik[i][0][0]:
                 correct+=1
@@ -1696,7 +1667,7 @@ def solve_corner(buffer_corner,rubik):
             if solve[i][2][2] == rubik[i][2][2]:
                 correct+=1
         if correct==24:
-            #print("Total number of corner swap is",corner_swap)
+            print("Total number of corner swap is",corner_swap)
             break
     
         if buffer_corner=="y1" or buffer_corner=="b1" or buffer_corner=="o3":
@@ -1715,134 +1686,66 @@ def solve_corner(buffer_corner,rubik):
                 if  solve[i][2][2] != rubik[i][2][2]:
                     buffer_corner=rubik[i][2][2]
                     break           
+        if buffer_corner[0]=="y":
+            if buffer_corner=="y3":
+                turns("R2 F3 Y F R2")
+            if buffer_corner=="y7":
+                turns("F Y F3")
+            if buffer_corner=="y9":
+                turns("F R Y R3 F3")
+                
+        if buffer_corner[0]=="b":    
+            if buffer_corner=="b3":
+                turns("F2 R Y R3 F2")   
+            if buffer_corner=="b7":
+                turns("D2 R Y R3 D2")
+            if buffer_corner=="b9":
+                turns("F2 Y F2")
 
-        if buffer_corner=="y3":
-            turn("R2")
-            turn("F3")
-            turn("Y")
-            turn("F")
-            turn("R2") 
-        if buffer_corner=="y7":
-            turn("F")
-            turn("Y")
-            turn("F3")
-        if buffer_corner=="y9":
-            turn("F")
-            turn("R")
-            turn("Y")
-            turn("R3")
-            turn("F3")            
-        if buffer_corner=="b3":
-            turn("F2")
-            turn("R")
-            turn("Y")
-            turn("R3")
-            turn("F2")     
-        if buffer_corner=="b7":
-            turn("D2")
-            turn("R")
-            turn("Y")
-            turn("R3")
-            turn("D2") 
-        if buffer_corner=="b9":
-            turn("F2")
-            turn("Y")
-            turn("F2") 
-        if buffer_corner=="r1":
-            turn("F3")
-            turn("D")
-            turn("R")
-            turn("Y")
-            turn("R3")
-            turn("D3")
-            turn("F") 
-        if buffer_corner=="r3":
-            turn("R3")
-            turn("F3")
-            turn("Y")
-            turn("F")
-            turn("R")
-        if buffer_corner=="r7":
-            turn("D")
-            turn("R")
-            turn("Y")
-            turn("R3")
-            turn("D3")
-        if buffer_corner=="r9":
-            turn("D")
-            turn("R2")
-            turn("Y")
-            turn("R2")
-            turn("D3")
-            
-        if buffer_corner=="g1":
-            turn("Y")
-        if buffer_corner=="g3":
-            turn("R3")
-            turn("Y")
-            turn("R")
-        if buffer_corner=="g7":
-            turn("R")
-            turn("Y")
-            turn("R3")
-        if buffer_corner=="g9":
-            turn("R2")
-            turn("Y")
-            turn("R2")
-            
-        if buffer_corner=="o1":
-            turn("R3")
-            turn("F")
-            turn("R")
-            turn("Y")
-            turn("R3")
-            turn("F3")
-            turn("R") 
-        if buffer_corner=="o7":
-            turn("D3")
-            turn("R")
-            turn("Y")
-            turn("R3")
-            turn("D")
-        if buffer_corner=="o9":
-            turn("D3")
-            turn("R2")
-            turn("Y")
-            turn("R2")
-            turn("D")
-        if buffer_corner=="w1":
-            turn("F3")
-            turn("R")
-            turn("Y")
-            turn("R3")
-            turn("F")
-        if buffer_corner=="w3":
-            turn("F3")
-            turn("Y")
-            turn("F")
-        if buffer_corner=="w7":
-            turn("D")
-            turn("F3")
-            turn("R")
-            turn("Y")
-            turn("R3")
-            turn("F")
-            turn("D3")
-        if buffer_corner=="w9":
-            turn("D3")
-            turn("F3")
-            turn("Y")
-            turn("F")
-            turn("D")         
+        if buffer_corner[0]=="r":        
+            if buffer_corner=="r1":
+                turns("F3 D R Y R3 D3 F")
+            if buffer_corner=="r3":
+                turns("R3 F3 Y F R")
+            if buffer_corner=="r7":
+                turns("D R Y R3 D3")
+            if buffer_corner=="r9":
+                turns("D R2 Y R2 D3")
+
+        if buffer_corner[0]=="g":        
+            if buffer_corner=="g1":
+                turns("Y")
+            if buffer_corner=="g3":
+                turns("R3 Y R")
+            if buffer_corner=="g7":
+                turns("R Y R3")
+            if buffer_corner=="g9":
+                turns("R2 Y R2")
+
+        if buffer_corner[0]=="o":
+            if buffer_corner=="o1":
+                turns("R3 F R Y R3 F3 R")
+            if buffer_corner=="o7":
+                turns("D3 R Y R3 D")
+            if buffer_corner=="o9":
+                turns("D3 R2 Y R2 D")
+                
+        if buffer_corner[0]=="w":
+            if buffer_corner=="w1":
+                turns("F3 R Y R3 F")
+            if buffer_corner=="w3":
+                turns("F3 Y F")
+            if buffer_corner=="w7":
+                turns("D F3 R Y R3 F D3")
+            if buffer_corner=="w9":
+                turns("D3 F3 Y F D")
+                
         corner_swap+=1
-        #read_rubik(rubik)
+        read_rubik(rubik)
         buffer_corner=check_sticker(buffer_corner_digit,rubik)
-        #print("Number of corner_swap is",corner_swap)
+        code.append(buffer_corner)
+        print("Number of corner_swap is",corner_swap)
     return rubik
-###code_colector
-#def code_colector(sticker):
- #   code_colector.append(sticker)
-  #  return code_colector
 
 ###solve
 def solve_the_rubik(rubik):
@@ -1850,17 +1753,15 @@ def solve_the_rubik(rubik):
     solve_edge(buffer_edge,rubik)
     solve_corner(buffer_corner,rubik)
     move=0
-    #print("All move is : ")
-    #while move<len(solution):
-     #   print(solution[move],end=" ")
-      #  move+=1
-    #print("\nTotal move is",move)
-    reset_rubik(rubik)
-    rubik[6]=(solution)
+
+    while len(solution)!=0:
+        a=solution.pop(0)
+        rubik[6].append(a)
+    solution.clear()
     return rubik
 
 def reset_rubik(rubik):
-    rubik=solve
+    rubik=new_rubik[new]
     return rubik
 
 ###Main
@@ -1875,20 +1776,70 @@ def main(rubik):
         print("or sol for solution")
         print(rubik[6])
         a = input("Input : ")
-        turn(a)
+        turns(a)
         if a== "sol":
+            solve_the_rubik(rubik)
             break
         if a== "ok":
             break
         read_rubik(rubik)
         if a!="new":
-            move.append(a)
-#    a = input("Again? yes/no : ")
- #   if a=="yes":
-  #      print("New game")
-   #     main(rubik)
-    #else:
-     #   return rubik
+            a=a.split(" ")
+            for i in a:
+                move.append(i)
+
+    if __name__ == '__main__':
+        import sys
+        try:
+            N = int(sys.argv[1])
+        except:
+            N = 3
+        c = Cube(N)
+        #print(rubik[6])
+    for a in rubik[6]:
+        if a[0] in ("U","L","F","R","B","D"):
+            if a in ("U","L","F","R","B","D"):
+                c.rotate_face(a)
+            if a in ["U2","L2","F2","R2","B2","D2"]:
+                c.rotate_face(a[0])
+                c.rotate_face(a[0])
+            if a in ["U3","L3","F3","R3","B3","D3"]:        
+                c.rotate_face(a[0], -1)
+
+            if a in ("Uw","Lw","Fw","Rw","Bw","Dw"):
+                c.rotate_face(a[0])
+                c.rotate_face(a[0],layer=1)
+            if a in ("Uw2","Lw2","Fw2","Rw2","Bw2","Dw2"):
+                c.rotate_face(a[0])
+                c.rotate_face(a[0])
+                c.rotate_face(a[0],layer=1)
+                c.rotate_face(a[0],layer=1)
+            if a in ("Uw3","Lw3","Fw3","Rw3","Bw3","Dw3"):
+                c.rotate_face(a[0],-1)
+                c.rotate_face(a[0],-1,layer=1)
+                
+        if a[0] in ("x","y","z"):  
+            if a in ("x","y","z"):
+                b={"x":"R","y":"U","z":"F"}
+                c.rotate_face(b[a])
+                c.rotate_face(b[a],layer=1)
+                c.rotate_face(b[a],layer=2)
+            if a in ("x2","y2","z2"):
+                b={"x":"R","y":"U","z":"F"}
+                c.rotate_face(b[a[0]])
+                c.rotate_face(b[a[0]])
+                c.rotate_face(b[a[0]],layer=1)
+                c.rotate_face(b[a[0]],layer=1)
+                c.rotate_face(b[a[0]],layer=2)
+                c.rotate_face(b[a[0]],layer=2)
+            if a in ("x3","y3","z3"):
+                b={"x":"R","y":"U","z":"F"}
+                c.rotate_face(b[a[0]])
+                c.rotate_face(b[a[0]],-1,layer=1)
+                c.rotate_face(b[a[0]],-1,layer=2)
+
+    c.draw_interactive()
+    plt.show()   
     
 ###Solve Binndford Pochmann Method
 buffer_edge_digit=[0,1,2]
@@ -1897,35 +1848,5 @@ buffer_corner_digit=[1,0,0]
 buffer_corner=check_sticker(buffer_corner_digit,rubik)
 ###Start
 main(rubik)
-
 ####################################################################
-if __name__ == '__main__':
-    import sys
-    try:
-        N = int(sys.argv[1])
-    except:
-        N = 3
-    c = Cube(N)
-    #print(rubik[6])
-    
-for a in rubik[6]:
-    if a in ("U","L","F","R","B","D"):
-        c.rotate_face(a)
-    if a in ["U2","L2","F2","R2","B2","D2"]:
-        c.rotate_face(a[0])
-        c.rotate_face(a[0])
-    if a in ["U3","L3","F3","R3","B3","D3"]:        
-        c.rotate_face(a[0], -1)        
-#rotate_face(self, face, turns=1, layer=0, steps=5):
-    # do a 3-corner swap
-    #c.rotate_face('R')
-    #c.rotate_face('D')
-    #c.rotate_face('R', -1)
-    #c.rotate_face('U', -1)
-    #c.rotate_face('R')
-    #c.rotate_face('D', -1)
-    #c.rotate_face('R', -1)
-    #c.rotate_face('U')
-c.draw_interactive()
-plt.show()
 
