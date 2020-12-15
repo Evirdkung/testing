@@ -505,14 +505,14 @@ class InteractiveCube(plt.Axes):
     def rotate(self, rot):
         self._current_rot = self._current_rot * rot
 
-    def rotate_face(self, face, turns=1, layer=0, steps=1):
+    def rotate_face(self, face, turns=1, layer=0, steps=3):
 ###
         if not np.allclose(turns, 0):
             for i in range(0,steps):
                 self.cube.rotate_face(face, turns * 1. / steps,
                                       layer=layer)
                 self._draw_cube()
-            
+                          
         
         if turns==1:
             if layer==0:
@@ -1766,7 +1766,6 @@ def solve_the_rubik(rubik):
     solve_center(rubik)
     solve_edge(buffer_edge,rubik)
     solve_corner(buffer_corner,rubik)
-    move=0
 
     while len(solution)!=0:
         a=solution.pop(0)
@@ -1774,26 +1773,25 @@ def solve_the_rubik(rubik):
     solution.clear()
     return rubik
 
-def reset_rubik(rubik):
-    rubik=new_rubik[new]
-    return rubik
-
 ###Main
 def main(rubik):
     read_rubik(rubik)
     print("\nStart!!!\n")
     while True:
-        print("Input turn (U/L/F/R/B/D/S/M/E with suffix (non/w/2/3) for turn the rubik")
+        print("\nInput(U/L/F/R/B/D/S/M/E with suffix (non/w/2/3) for turn the rubik")
         print("or x/y/z for rotation the rubik")
+        print("or Ja/Jb/Ra/Y/T for permutation the top layer")
         print("or new for random scumble")
         print("or sol for solution")
         print(collector)
         a = input("Input : ")
         print("\nLet Start!!!\n")
-        if a in ["T","Ja","Jb","Ra","Y"]:
-            continue        
-        turns(a)
+        
+        if a not in ["T","Ja","Jb","Ra","Y"]:
+            turns(a)
+            
         b=a.split(" ")
+        
         if a== "sol":
             break
         read_rubik(rubik)
@@ -1811,6 +1809,8 @@ def main(rubik):
                      "x","y","z","x2","y2","z2","x3","y3","z3"
                      "T","Ja","Jb","Ra","Y"]:
                 collector.append(i)
+            else:
+                print("The invalid input :",i)
 
 
     if __name__ == '__main__':
@@ -1885,12 +1885,6 @@ def main(rubik):
                 
     c.draw_interactive()
     plt.show()
-    print("1",move)
-    print("2",rubik[6])
-    print("3",collector)
-    print("4",code)
-    print("5",solution)
-    read_rubik(rubik)
     main(rubik)
 ###Solve Binndford Pochmann Method
 buffer_edge_digit=[0,1,2]
