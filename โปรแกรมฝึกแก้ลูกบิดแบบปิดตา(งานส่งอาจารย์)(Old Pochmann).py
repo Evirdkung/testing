@@ -506,14 +506,14 @@ class InteractiveCube(plt.Axes):
         self._current_rot = self._current_rot * rot
 
     def rotate_face(self, face, turns=1, layer=0, steps=3):
-###
         if not np.allclose(turns, 0):
             for i in range(0,steps):
                 self.cube.rotate_face(face, turns * 1. / steps,
                                       layer=layer)
                 self._draw_cube()
                           
-        
+##################################################################################
+# I write this
         if turns==1:
             if layer==0:
                 turn(face,b=2)
@@ -535,7 +535,7 @@ class InteractiveCube(plt.Axes):
                 turn(a[face],b=2)
         
         
-###
+##################################################################################
     def _reset_view(self, *args):
         self.set_xlim(self._start_xlim)
         self.set_ylim(self._start_ylim)
@@ -544,6 +544,9 @@ class InteractiveCube(plt.Axes):
 
 
     def _solve_cube(self, *args,rubik_1=rubik):
+
+##################################################################################
+# I write this
         move=[]
         rubik_1[6]=[]
         
@@ -627,6 +630,7 @@ class InteractiveCube(plt.Axes):
         
         self.cube._move_list = []
         return rubik
+##################################################################################
 
     def _key_press(self, event):
         """Handler for key press events"""
@@ -722,6 +726,7 @@ class InteractiveCube(plt.Axes):
 
                 self.figure.canvas.draw()
 ####################################################################################
+# Write By myself
 
 code_colector = []
 swap_position=[]
@@ -1474,7 +1479,7 @@ def scramble(rubik):
     i=1
     c=0
     d=0
-    while i<=15:
+    while i<=12:
         while c==d:
             c = random.randint(1,3)
         r = random.randint(1,6)
@@ -1550,6 +1555,7 @@ def solve_center(rubik):
         turns("x3")
     if "y5"==rubik[5][1][1]:
         turns("x2")
+        
     if "r5"==rubik[1][1][1]:
         turns("y3")
     if "r5"==rubik[3][1][1]:
@@ -1780,10 +1786,11 @@ def main(rubik):
     while True:
         print("\nInput(U/L/F/R/B/D/S/M/E with suffix (non/w/2/3) for turn the rubik")
         print("or x/y/z for rotation the rubik")
-        print("or Ja/Jb/Ra/Y/T for permutation the top layer")
         print("or new for random scumble")
         print("or sol for solution")
-        print(collector)
+        if len(collector)!=0: 
+            print("\nThe scramble :",collector)
+            
         a = input("Input : ")
         print("\nLet Start!!!\n")
         
@@ -1806,11 +1813,11 @@ def main(rubik):
                      "Uw","Lw","Fw","Rw","Bw","Dw",
                      "Uw2","Lw2","Fw2","Rw2","Bw2","Dw2",
                      "Uw3","Lw3","Fw3","Rw3","Bw3","Dw3",
-                     "x","y","z","x2","y2","z2","x3","y3","z3"
-                     "T","Ja","Jb","Ra","Y"]:
+                     "x","y","z","x2","y2","z2","x3","y3","z3"]:
                 collector.append(i)
             else:
-                print("The invalid input :",i)
+                if i not in ["new","sol"]:
+                    print("INVALID INPUT :",i)
 
 
     if __name__ == '__main__':
@@ -1866,7 +1873,7 @@ def main(rubik):
                 c.rotate_face(b[a[0]],layer=2)
                 continue
             elif a in ("x3","y3","z3"):
-                c.rotate_face(b[a[0]])
+                c.rotate_face(b[a[0]],-1)
                 c.rotate_face(b[a[0]],-1,layer=1)
                 c.rotate_face(b[a[0]],-1,layer=2)
                 continue
@@ -1885,6 +1892,7 @@ def main(rubik):
                 
     c.draw_interactive()
     plt.show()
+    collector.clear()
     main(rubik)
 ###Solve Binndford Pochmann Method
 buffer_edge_digit=[0,1,2]
