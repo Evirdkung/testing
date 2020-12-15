@@ -1785,15 +1785,15 @@ def main(rubik):
     while True:
         print("Input turn (U/L/F/R/B/D/S/M/E with suffix (non/w/2/3) for turn the rubik")
         print("or x/y/z for rotation the rubik")
-        print("or Ja/Jb/Ra/Y/T for permutation the top layer")
         print("or new for random scumble")
         print("or sol for solution")
         print(collector)
         a = input("Input : ")
         print("\nLet Start!!!\n")
+        if a in ["T","Ja","Jb","Ra","Y"]:
+            continue        
         turns(a)
         b=a.split(" ")
-        
         if a== "sol":
             break
         read_rubik(rubik)
@@ -1801,7 +1801,6 @@ def main(rubik):
             a=a.split(" ")
             for i in a:
                 rubik[6].append(i)
-                print("r6",rubik[6])
         for i in b:
             if i in ["U","L","F","R","B","D","S","M","E",
                      "U2","L2","F2","R2","B2","D2","S2","M2","E2",
